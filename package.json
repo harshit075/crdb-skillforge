@@ -7,6 +7,7 @@
   "scripts": {
     "test": "cd adapters/mcp-server && npm test",
     "mcp": "cd adapters/mcp-server && npm start",
+    "app": "python app/server.py",
     "validate": "python tools/validate-skill.py",
     "cursor": "python adapters/cursor/generate.py"
   },

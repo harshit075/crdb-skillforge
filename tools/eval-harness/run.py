@@ -6,8 +6,9 @@ import glob
 from pathlib import Path
 from typing import List, Dict, Any, Tuple
 
-root_dir = Path(__file__).resolve().parent.parent.parent
-sys.path.insert(0, str(root_dir))
+eval_dir = Path(__file__).resolve().parent
+if str(eval_dir) not in sys.path:
+    sys.path.insert(0, str(eval_dir))
 
 from scoring import score_case_result
 from tools.crdb.sql import execute_sql

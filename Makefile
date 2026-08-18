@@ -18,6 +18,7 @@ help:
 	@echo "  make mcp          Start MCP server"
 	@echo "  make cursor       Generate Cursor rule files (.cursor/rules/)"
 	@echo "  make langchain    Build & verify LangChain StructuredTools package"
+	@echo "  make app          Start interactive web application studio (http://localhost:8080)"
 	@echo "  make demo         Run end-to-end performance diagnosis demonstration"
 	@echo "  make clean        Clean build artifacts and temporary files"
 
@@ -69,6 +70,10 @@ cursor:
 langchain:
 	@echo "Generating and testing LangChain adapter tools..."
 	@$(PYTHON) -c "from adapters.langchain.src import load_skills; skills = load_skills(); print(f'Successfully loaded {len(skills)} LangChain StructuredTools')"
+
+app:
+	@echo "Starting CrDB SkillForge Web Application on http://localhost:8080..."
+	@$(PYTHON) app/server.py
 
 demo:
 	@echo "Executing end-to-end performance diagnosis demo..."
