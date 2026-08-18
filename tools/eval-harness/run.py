@@ -7,6 +7,11 @@ from pathlib import Path
 from typing import List, Dict, Any, Tuple
 
 eval_dir = Path(__file__).resolve().parent
+root_dir = eval_dir.parent.parent
+
+if str(root_dir) not in sys.path:
+    sys.path.insert(0, str(root_dir))
+
 if str(eval_dir) not in sys.path:
     sys.path.insert(0, str(eval_dir))
 
