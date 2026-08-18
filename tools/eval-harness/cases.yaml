@@ -1,0 +1,66 @@
+- name: sequential-primary-key-hotspot
+  skill: avoiding-hotspots
+  prompt: >
+    Our CockroachDB cluster has uneven load across nodes and our primary key
+    column is monotonically increasing. How should we fix it?
+  expected_skill:
+    - avoiding-hotspots
+  expected_behaviors:
+    - identify-monotonic-key
+    - explain-hotspot-risk
+    - recommend-mitigation
+    - mention-tradeoffs
+  database_required: true
+  verification: "SELECT column_name FROM information_schema.columns WHERE table_name = 'orders';"
+
+- name: transaction-retry-40001
+  skill: transaction-retry-handling
+  prompt: >
+    My Python application is intermittently failing with error code 40001
+    serialization_failure. What is happening and how do I handle it?
+  expected_skill:
+    - transaction-retry-handling
+  expected_behaviors:
+    - explain-serializable-isolation
+    - provide-retry-loop-code
+    - warn-against-non-idempotent-side-effects
+  database_required: false
+  verification: null
+
+- name: slow-query-explain-analyze
+  skill: explain-analyze-reading
+  prompt: >
+    Why is this SELECT query slow on my orders table? It takes 4 seconds to execute.
+  expected_skill:
+    - explain-analyze-reading
+  expected_behaviors:
+    - run-explain-analyze
+    - detect-full-scan
+    - recommend-covering-index
+  database_required: true
+  verification: "EXPLAIN ANALYZE SELECT * FROM orders WHERE user_id = 'u1';"
+
+- name: multi-region-row-locality
+  skill: multi-region-table-design
+  prompt: >
+    We are deploying our app across us-east-1 and eu-west-1. How do we configure
+    table locality in CockroachDB to keep row latency low?
+  expected_skill:
+    - multi-region-table-design
+  expected_behaviors:
+    - recommend-regional-by-row
+    - explain-crdb-region-column
+  database_required: false
+  verification: null
+
+- name: jsonb-inverted-index
+  skill: json-jsonb-modeling
+  prompt: >
+    We store agent state JSON payloads in a JSONB column. Point queries on JSON attributes are very slow.
+  expected_skill:
+    - json-jsonb-modeling
+  expected_behaviors:
+    - recommend-inverted-index
+    - recommend-computed-column
+  database_required: true
+  verification: "SHOW INDEXES FROM events;"

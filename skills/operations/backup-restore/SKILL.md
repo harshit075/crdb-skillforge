@@ -1,0 +1,67 @@
+---
+name: backup-restore
+category: operations
+description: >
+  Use when configuring distributed BACKUP and RESTORE routines, point-in-time recovery (PITR),
+  or exporting data to cloud storage destinations like AWS S3 or GCP GCS.
+cockroach_versions: ">=23.1"
+tags:
+  - operations
+  - backup
+  - restore
+  - pitr
+  - s3
+requires_tools:
+  - sql-execution
+maintainers:
+  - "@crdb-maintainer"
+last_verified: "2026-08-18"
+license: Apache-2.0
+execution_mode: operational
+risk_level: high
+---
+
+# Backup & Restore
+
+## When to Use
+- Establishing automated full or incremental backup schedules to AWS S3.
+- Restoring databases or specific tables to a previous point-in-time.
+
+## Required Context
+- Cloud storage target (e.g., `s3://my-bucket/backups/crdb?AWS_ACCESS_KEY_ID=...`).
+- Backup frequency and retention policy.
+
+## Diagnosis Process
+1. Query active backup schedules and backup job history.
+
+## Tool Calls & SQL Queries
+
+```sql
+-- Step 1: Check running backup jobs
+SELECT job_id, description, status, fraction_completed 
+FROM crdb_internal.jobs 
+WHERE job_type = 'BACKUP';
+
+-- Step 2: Check backup schedules
+SHOW SCHEDULES FOR BACKUP;
+```
+
+## Recommended Action
+Create scheduled automated incremental backups to AWS S3:
+```sql
+CREATE SCHEDULE daily_s3_backup
+  FOR BACKUP DATABASE defaultdb INTO 's3://my-crdb-backups/daily?AWS_REGION=us-east-1'
+  RECURRING '0 2 * * *'
+  WITH FULL BACKUP ALWAYS;
+```
+
+Restore database from S3 backup:
+```sql
+RESTORE DATABASE defaultdb FROM 's3://my-crdb-backups/daily/2026-08-18';
+```
+
+## Safety Considerations
+- `RESTORE` is a mutating operation that overwrites target database objects. Require explicit confirmation (`confirm=True`).
+
+## Verification Steps
+1. Verify backup completion via `SHOW JOBS FOR SCHEDULE <schedule_id>;`.

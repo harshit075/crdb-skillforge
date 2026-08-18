@@ -1,0 +1,64 @@
+---
+name: transaction-retry-handling
+category: performance
+description: >
+  Use when application transactions fail with PostgreSQL error code 40001 (serialization_failure /
+  TransactionRetryWithTuningError), or designing resilient client transaction retry loops.
+cockroach_versions: ">=23.1"
+tags:
+  - performance
+  - transactions
+  - retry-logic
+  - serializable
+requires_tools:
+  - sql-execution
+maintainers:
+  - "@crdb-maintainer"
+last_verified: "2026-08-18"
+license: Apache-2.0
+execution_mode: recommendation
+risk_level: low
+---
+
+# Transaction Retry Handling
+
+## Trigger Conditions
+- Application receives `psycopg2.errors.SerializationFailure: restart transaction: TransactionRetryWithTuningError: ...` (SQLSTATE `40001`).
+- Concurrent read-write transactions conflict under CockroachDB's strict SERIALIZABLE isolation level.
+
+## Required Information
+- Application code transaction block structure.
+- SQL queries executed inside the transaction.
+
+## Diagnosis Process
+1. CockroachDB operates under `SERIALIZABLE` transaction isolation by default to prevent anomalies.
+2. When concurrent transactions modify intersecting key ranges, one transaction is aborted with SQLSTATE `40001` and must be retried by the client.
+
+## Recommended Fix (Python Driver Example)
+Wrap multi-statement transactions in exponential backoff retry loops:
+
+```python
+import time
+import psycopg2
+
+def execute_with_retry(conn, txn_func, max_retries=5):
+    retries = 0
+    while True:
+        try:
+            with conn:
+                with conn.cursor() as cur:
+                    return txn_func(cur)
+        except psycopg2.errors.SerializationFailure as err:
+            retries += 1
+            if retries > max_retries:
+                raise err
+            sleep_time = (2 ** retries) * 0.1
+            time.sleep(sleep_time)
+```
+
+## Anti-Patterns
+- Catching `40001` errors and ignoring them without re-executing the transaction statements from the beginning.
+- Executing non-idempotent side effects (e.g. sending emails or external API calls) inside the transaction retry block.
+
+## Verification Steps
+1. Simulate concurrent conflicting updates in test suite and verify retry handler successfully completes after retry.

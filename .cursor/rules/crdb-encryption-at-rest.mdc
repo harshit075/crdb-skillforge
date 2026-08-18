@@ -1,0 +1,26 @@
+---
+description: Use when configuring or auditing Encryption at Rest (CCEE) for Pebble storage engine, KMS key rotation, or compliance security validation.
+globs: **/*.sql, **/*.py, **/*.js, **/*.ts, **/*.go, **/*.java
+tags: security, encryption-at-rest, pebble, kms
+---
+
+# CockroachDB Skill: encryption-at-rest
+
+# Encryption at Rest
+
+## When to Use
+- Enabling hardware/software Encryption at Rest for cluster data stores.
+- Integrating AWS KMS or HashiCorp Vault for store encryption keys.
+
+## Required Context
+- Cloud provider KMS ARN or Vault configuration endpoint.
+
+## Recommended Action
+Configure store flag `--enterprise-encryption` on node start:
+```bash
+cockroach start \
+  --store=path=/mnt/data,attrs=store1,encryption-at-rest-kms-type=aws,encryption-at-rest-kms-aws-key-arn=arn:aws:kms:us-east-1:123456789012:key/abc-123
+```
+
+## Verification Steps
+1. Verify cluster settings `enterprise.encryption.enabled = true`.

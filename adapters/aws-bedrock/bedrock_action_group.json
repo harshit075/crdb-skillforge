@@ -1,0 +1,112 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "CrDB SkillForge Agent Tools API",
+    "description": "Amazon Bedrock Action Group API for executing CockroachDB diagnostic and agentic memory skills.",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/execute_sql": {
+      "post": {
+        "summary": "Execute SQL against CockroachDB",
+        "operationId": "executeSql",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "query": {
+                    "type": "string"
+                  },
+                  "read_only": {
+                    "type": "boolean",
+                    "default": true
+                  }
+                },
+                "required": [
+                  "query"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Query execution result"
+          }
+        }
+      }
+    },
+    "/explain_analyze": {
+      "post": {
+        "summary": "Run EXPLAIN ANALYZE on query",
+        "operationId": "explainAnalyze",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "query": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "query"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Execution plan diagnostics"
+          }
+        }
+      }
+    },
+    "/vector_search": {
+      "post": {
+        "summary": "Distributed Vector Index search in CockroachDB",
+        "operationId": "vectorSearch",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "table_name": {
+                    "type": "string"
+                  },
+                  "vector_column": {
+                    "type": "string"
+                  },
+                  "query_vector": {
+                    "type": "array",
+                    "items": {
+                      "type": "number"
+                    }
+                  }
+                },
+                "required": [
+                  "table_name",
+                  "vector_column",
+                  "query_vector"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Nearest vector matches"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,55 @@
+---
+description: Use when initializing a single-node or multi-node local CockroachDB cluster for development, testing, or local AI agent workflow validation.
+globs: **/*.sql, **/*.py, **/*.js, **/*.ts, **/*.go, **/*.java
+tags: onboarding, cluster-setup, dev-environment
+---
+
+# CockroachDB Skill: cluster-setup-local
+
+# Cluster Setup (Local)
+
+## When to Use
+- Setting up a brand-new local CockroachDB instance for agent testing or development.
+- Initializing single-node insecure or multi-node secure local test environments using Docker or binary commands.
+
+## Required Context
+- Operating environment (Docker vs binary).
+- Desired cluster mode (insecure single-node vs secure multi-node).
+- Connection ports (default SQL port: 26257, DB Console port: 8080).
+
+## Diagnosis Process
+1. Query cluster version and startup state.
+2. Verify node live connectivity and active range leases.
+
+## Tool Calls & SQL Queries
+
+```sql
+-- Step 1: Verify version and cluster status
+SELECT version();
+
+-- Step 2: Inspect active nodes
+SHOW NODES;
+
+-- Step 3: Verify database availability
+SHOW DATABASES;
+```
+
+## Interpretation Rules
+- If `SHOW NODES` returns 1 node with `is_live = true`, single-node dev cluster is operational.
+- If connection fails on port 26257, check container status or process listening state.
+
+## Recommended Fix
+Run single-node container via Docker:
+```bash
+docker run -d --name crdb-node -p 26257:26257 -p 8080:8080 cockroachdb/cockroach:v24.1.0 start-single-node --insecure
+```
+
+## Safety Considerations
+- Single-node insecure mode is strictly for development and non-production testing.
+
+## Anti-Patterns
+- Using `--insecure` in production or Internet-exposed staging environments.
+
+## Verification Steps
+1. Execute `SELECT version();` using `sql-execution`.
+2. Confirm return of valid CockroachDB version string.

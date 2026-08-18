@@ -1,0 +1,60 @@
+---
+name: contention-diagnosis
+category: performance
+description: >
+  Use when diagnosing transaction contention, lock waiting, row-level latch contention,
+  or identifying high-contention keys in crdb_internal.transaction_contention.
+cockroach_versions: ">=23.1"
+tags:
+  - performance
+  - contention
+  - transaction-locks
+  - latches
+requires_tools:
+  - sql-execution
+  - explain-analyze
+maintainers:
+  - "@crdb-maintainer"
+last_verified: "2026-08-18"
+license: Apache-2.0
+execution_mode: diagnostic
+risk_level: low
+---
+
+# Contention Diagnosis
+
+## Trigger Conditions
+- High transaction latency spikes or frequent transaction retries (`40001`).
+- Multiple transactions attempting to write or read-lock the exact same row (e.g. updating a centralized counter row).
+
+## Required Information
+- Active statement metrics and contention tables.
+
+## Diagnosis Process
+1. Query `crdb_internal.transaction_contention` for contended tables, keys, and waiting transaction IDs.
+2. Identify hot rows causing row-level latch conflicts.
+
+## Tool Calls & SQL Queries
+
+```sql
+-- Query 1: Inspect transaction contention history
+SELECT 
+  table_name, 
+  index_name, 
+  contending_key, 
+  waiting_stmt_id, 
+  blocking_stmt_id, 
+  cum_contention_time
+FROM crdb_internal.transaction_contention
+ORDER BY cum_contention_time DESC
+LIMIT 10;
+```
+
+## Recommended Fixes
+- **Batching & Re-ordering**: Access rows in deterministic primary key order across all transactions to avoid deadlocks.
+- **Selective SELECT FOR UPDATE**: Use `SELECT ... FOR UPDATE` only on rows strictly requiring lock reservation.
+- **Split Hot Counters**: Shard central counter tables into N rows (e.g. 10 bucket rows) and sum them up on read.
+
+## Verification Steps
+1. Re-query `crdb_internal.transaction_contention` after fix.
+2. Confirm cumulative contention time stabilizes or drops to zero.

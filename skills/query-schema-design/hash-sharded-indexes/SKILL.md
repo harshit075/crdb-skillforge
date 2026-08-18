@@ -1,0 +1,73 @@
+---
+name: hash-sharded-indexes
+category: query-schema-design
+description: >
+  Use when indexing sequential or monotonically increasing values (such as auto-incrementing
+  IDs, sequence values, or timestamps) to prevent range hotspotting across nodes.
+cockroach_versions: ">=23.1"
+tags:
+  - schema-design
+  - indexing
+  - hash-sharding
+  - hotspots
+requires_tools:
+  - sql-execution
+  - schema-inspection
+  - index-inspection
+maintainers:
+  - "@crdb-maintainer"
+last_verified: "2026-08-18"
+license: Apache-2.0
+execution_mode: diagnostic
+risk_level: medium
+---
+
+# Hash-Sharded Indexes
+
+## When to Use
+- User needs to index a sequential column (like `created_at` timestamp or sequence `id`) without creating write bottlenecks on a single Range.
+- Range workload distribution shows high write pressure concentrated on the tail Range.
+
+## Required Context
+- Target table name.
+- High-write sequential indexed column.
+
+## Diagnosis Process
+1. Inspect table indexes using `index-inspection`.
+2. Determine whether sequential index lacks hash sharding (`USING HASH WITH (bucket_count = N)`).
+
+## Tool Calls & SQL Queries
+
+```sql
+-- Step 1: Inspect index definitions
+SHOW INDEXES FROM %TABLE_NAME%;
+
+-- Step 2: Identify sequential index definition
+SELECT index_name, column_name, is_sharded 
+FROM crdb_internal.table_indexes 
+WHERE descriptor_name = '%TABLE_NAME%';
+```
+
+## Interpretation Rules
+- Sequential primary keys or indexes cause all new inserts to land on the last Range.
+- Applying hash sharding prepends a hidden bucket ID (e.g. `bucket_count = 16`), distributing inserts across 16 distinct Ranges.
+
+## Recommended Fix
+Add a hash-sharded index or table modifier:
+```sql
+CREATE INDEX idx_created_at_sharded ON orders (created_at) USING HASH WITH (bucket_count = 16);
+```
+Or for Primary Key:
+```sql
+ALTER TABLE orders ALTER PRIMARY KEY USING HASH WITH (bucket_count = 16);
+```
+
+## Safety Considerations
+- Hash-sharded indexes turn equality lookups and point reads into multi-bucket fanouts if bucket prefix is omitted.
+
+## Anti-Patterns
+- Hash sharding columns that are frequently read via fast range-scans without bucket filters.
+
+## Verification Steps
+1. Re-inspect indexes via `index-inspection`.
+2. Verify index definition contains `USING HASH WITH (bucket_count = 16)`.

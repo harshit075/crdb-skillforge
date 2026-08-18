@@ -1,0 +1,56 @@
+---
+description: Use when modeling dynamic JSON/JSONB documents in CockroachDB, creating inverted GIN indexes, or extracting JSON fields into computed columns for fast indexing.
+globs: **/*.sql, **/*.py, **/*.js, **/*.ts, **/*.go, **/*.java
+tags: schema-design, jsonb, inverted-index, computed-columns
+---
+
+# CockroachDB Skill: json-jsonb-modeling
+
+# JSON & JSONB Modeling
+
+## When to Use
+- Storing semi-structured data, agent state payloads, or flexible metadata in `JSONB` columns.
+- Queries filtering on deep JSON properties are slow due to full table scans.
+
+## Required Context
+- Target table and JSONB column name.
+- Frequently queried JSON field paths (e.g. `metadata->>'status'`).
+
+## Diagnosis Process
+1. Inspect table column types and existing indexes.
+2. Check if query uses JSON operators (`->`, `->>`, `@>`) without an inverted or expression index.
+
+## Tool Calls & SQL Queries
+
+```sql
+-- Step 1: Check column definition
+SELECT column_name, data_type 
+FROM information_schema.columns 
+WHERE table_name = '%TABLE_NAME%' AND data_type = 'jsonb';
+
+-- Step 2: Check indexes
+SHOW INDEXES FROM %TABLE_NAME%;
+```
+
+## Interpretation Rules
+- For containment queries (`payload @> '{"status": "active"}'`), use an **Inverted Index** (`CREATE INDEX ON table USING INVERTED (payload)`).
+- For specific scalar field lookups (`payload->>'user_id'`), use a **Computed Column + Secondary Index** or expression index.
+
+## Recommended Fix
+Option 1: Inverted Index
+```sql
+CREATE INDEX idx_events_payload_inverted ON events USING INVERTED (payload);
+```
+
+Option 2: Stored Computed Column Index (Fastest Point Lookups)
+```sql
+ALTER TABLE events ADD COLUMN user_id STRING AS (payload->>'user_id') STORED;
+CREATE INDEX idx_events_user_id ON events (user_id);
+```
+
+## Safety Considerations
+- Inverted indexes on very large JSON documents (e.g. > 1 MB) increase write amplification.
+
+## Verification Steps
+1. Verify index creation via `SHOW INDEXES FROM %TABLE_NAME%;`.
+2. Confirm EXPLAIN query plan utilizes index scan.

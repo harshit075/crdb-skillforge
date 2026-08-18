@@ -1,0 +1,38 @@
+---
+description: Use when selecting, configuring, or evaluating client database drivers, ORMs, and connection poolers for CockroachDB across Python, Node.js, Go, or Java.
+globs: **/*.sql, **/*.py, **/*.js, **/*.ts, **/*.go, **/*.java
+tags: onboarding, driver-selection, orm
+---
+
+# CockroachDB Skill: choosing-a-driver
+
+# Choosing a Driver
+
+## When to Use
+- User asks which ORM or database driver to select for CockroachDB compatibility.
+- Configuring transaction retry logic at the driver/ORM level.
+
+## Required Context
+- Target programming language (Python, TypeScript/Node.js, Go, Java, Rust).
+- ORM requirements (SQLAlchemy, Prisma, GORM, Hibernate, Drizzle).
+
+## Diagnosis Process
+1. Evaluate client language requirements against CockroachDB dialect features.
+2. Verify support for automatic transaction retries (error code `40001` / `serialization_failure`).
+
+## Interpretation Rules
+- Python: `psycopg` (v3) or `psycopg2-binary` with `SQLAlchemy` (cockroachdb dialect dialect).
+- Node.js: `pg` (node-postgres) with Prisma or Drizzle ORM.
+- Go: `pgx/v5` with native transaction retry wrappers.
+
+## Recommended Fix
+In corporate Python applications, configure `psycopg` with retry logic for code `40001`.
+
+## Safety Considerations
+- Ensure retry loops are idempotent.
+
+## Anti-Patterns
+- Using non-PostgreSQL native drivers.
+
+## Verification Steps
+1. Test driver basic connection and query execution.

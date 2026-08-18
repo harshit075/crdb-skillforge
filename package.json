@@ -1,0 +1,30 @@
+{
+  "name": "crdb-skillforge",
+  "version": "0.1.0",
+  "description": "Executable CockroachDB expertise for AI agents.",
+  "main": "adapters/mcp-server/index.js",
+  "type": "commonjs",
+  "scripts": {
+    "test": "cd adapters/mcp-server && npm test",
+    "mcp": "cd adapters/mcp-server && npm start",
+    "validate": "python tools/validate-skill.py",
+    "cursor": "python adapters/cursor/generate.py"
+  },
+  "keywords": [
+    "cockroachdb",
+    "ai-agents",
+    "mcp",
+    "cursor",
+    "langchain",
+    "database-skills"
+  ],
+  "author": "CrDB SkillForge Contributors",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/harshit075/crdb-skillforge.git"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
+  }
+}
