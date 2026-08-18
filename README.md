@@ -153,12 +153,18 @@ make eval
 make mcp
 ```
 
-### 8. Generate Cursor Rules
+### 8. Start Interactive Web Application Studio (http://localhost:8080)
+```bash
+make app
+```
+Or run directly: `python app/server.py`
+
+### 9. Generate Cursor Rules
 ```bash
 make cursor
 ```
 
-### 9. Execute End-to-End Performance Diagnosis Demo
+### 10. Execute End-to-End Performance Diagnosis Demo
 ```bash
 make demo
 ```

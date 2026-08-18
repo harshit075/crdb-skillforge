@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CrDB SkillForge — Executable CockroachDB Agent Skills Platform</title>
+  <meta name="description" content="Executable CockroachDB expertise for AI agents portable across Claude, Cursor, LangChain, AWS Bedrock, and MCP clients.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="brand">
+        <div class="logo-icon">⚡</div>
+        <div class="brand-text">
+          <h1>CrDB SkillForge</h1>
+          <p class="tagline">Executable CockroachDB expertise for AI agents.</p>
+        </div>
+      </div>
+      <div class="header-badges">
+        <span class="badge badge-crdb"><span class="pulse"></span> CockroachDB v24.1.0</span>
+        <span class="badge badge-aws">AWS Bedrock & Lambda</span>
+        <span class="badge badge-mcp">MCP Server Active</span>
+      </div>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <nav class="nav-tabs">
+      <button class="tab-btn active" data-tab="studio">🎯 Diagnostic Studio</button>
+      <button class="tab-btn" data-tab="memory">🧠 Agentic Memory Explorer</button>
+      <button class="tab-btn" data-tab="catalog">📚 Skills Catalog (21)</button>
+      <button class="tab-btn" data-tab="adapters">🔌 Framework Adapters</button>
+      <button class="tab-btn" data-tab="telemetry">📡 Telemetry & S3 Audit</button>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="content-area">
+      <!-- TAB 1: DIAGNOSTIC STUDIO -->
+      <section id="tab-studio" class="tab-panel active">
+        <div class="card glass-panel">
+          <div class="card-header">
+            <h2>AI Agent Diagnostic Workflow</h2>
+            <span class="step-indicator">Step-by-Step Execution</span>
+          </div>
+          
+          <div class="preset-scenarios">
+            <span class="preset-label">Sample Agent Inputs:</span>
+            <button class="preset-btn" onclick="loadScenario('slow_query')">🐢 Slow Query Triage</button>
+            <button class="preset-btn" onclick="loadScenario('hotspot')">🔥 Monotonic PK Hotspot</button>
+            <button class="preset-btn" onclick="loadScenario('retry')">🔄 Transaction 40001 Retry</button>
+            <button class="preset-btn" onclick="loadScenario('region')">🌍 Multi-Region Locality</button>
+          </div>
+
+          <div class="input-group">
+            <label for="promptInput">Agent Prompt / Symptom Description:</label>
+            <div class="input-wrapper">
+              <input type="text" id="promptInput" placeholder="e.g. My CockroachDB application query 'SELECT * FROM orders WHERE status = pending' is slow. Find out why and fix it." value="My CockroachDB application query 'SELECT * FROM orders WHERE status = pending' is slow. Find out why and fix it.">
+              <button id="runDiagBtn" class="btn primary-btn">Execute Agent Workflow 🚀</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Diagnostic Execution Steps Visualizer -->
+        <div id="diagnosticResults" class="results-grid hidden">
+          <!-- Step 1: Skill Discovery -->
+          <div class="card result-card">
+            <div class="result-header">
+              <span class="step-badge">1</span>
+              <h3>Skill Discovery Engine</h3>
+            </div>
+            <div class="result-body">
+              <div class="stat-row">
+                <span>Matched Skill:</span>
+                <strong id="resSkillName" class="highlight-text">-</strong>
+              </div>
+              <div class="stat-row">
+                <span>Discovery Score:</span>
+                <span id="resSkillScore" class="score-pill">-</span>
+              </div>
+              <div class="stat-row">
+                <span>Category:</span>
+                <span id="resSkillCategory" class="tag-pill">-</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 2: Inspection & EXPLAIN BEFORE -->
+          <div class="card result-card">
+            <div class="result-header">
+              <span class="step-badge">2</span>
+              <h3>EXPLAIN ANALYZE (Before Fix)</h3>
+            </div>
+            <div class="result-body">
+              <pre id="resBeforeExplain" class="code-block">Loading...</pre>
+              <div class="scan-alert scan-full">⚠️ Scan Method: Full Table Scan (1,204 rows)</div>
+            </div>
+          </div>
+
+          <!-- Step 3: Bedrock Reasoning & Remediation -->
+          <div class="card result-card">
+            <div class="result-header">
+              <span class="step-badge">3</span>
+              <h3>AWS Bedrock AI Remediation</h3>
+            </div>
+            <div class="result-body">
+              <p id="resBedrockText" class="bedrock-msg">Analyzing plan...</p>
+              <div class="fix-applied">
+                <span>Applied Remedy:</span>
+                <code id="resFixSql">CREATE INDEX idx_orders_status_created ON orders (status, created_at DESC);</code>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 4: EXPLAIN AFTER & Verification -->
+          <div class="card result-card">
+            <div class="result-header">
+              <span class="step-badge">4</span>
+              <h3>Verification & S3 Telemetry</h3>
+            </div>
+            <div class="result-body">
+              <pre id="resAfterExplain" class="code-block">Loading...</pre>
+              <div class="scan-alert scan-optimal">✅ Scan Method: Index Scan (Covering)</div>
+              <div class="s3-link">
+                <span>S3 Archive:</span>
+                <code id="resS3Uri">s3://crdb-skillforge-telemetry/telemetry/diagnostic.json</code>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 2: AGENTIC MEMORY EXPLORER -->
+      <section id="tab-memory" class="tab-panel">
+        <div class="card glass-panel">
+          <h2>CockroachDB Agentic Memory Layer</h2>
+          <p class="subtitle">Distributed vector similarity search and persistent session state across region failovers.</p>
+          
+          <div class="vector-search-box">
+            <label>Query Vector Embedding Search (CockroachDB Distributed Vector Index):</label>
+            <div class="input-wrapper">
+              <input type="text" id="vecInput" value="[0.15, 0.30, 0.90]">
+              <button id="searchVecBtn" class="btn secondary-btn">Vector Search (&lt;-&gt;) 🔍</button>
+            </div>
+          </div>
+
+          <div id="vectorResults" class="vector-results-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Memory ID</th>
+                  <th>Agent ID</th>
+                  <th>Memory Key</th>
+                  <th>Content Payload</th>
+                  <th>Vector Distance (<->)</th>
+                </tr>
+              </thead>
+              <tbody id="vecTableBody">
+                <tr>
+                  <td><code>m100</code></td>
+                  <td>agent-bedrock</td>
+                  <td>checkpoint-prod</td>
+                  <td>Agent state preserved across region failover</td>
+                  <td><span class="distance-badge">0.042</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 3: SKILLS CATALOG -->
+      <section id="tab-catalog" class="tab-panel">
+        <div class="catalog-controls">
+          <input type="text" id="catalogSearch" placeholder="Filter skills by keyword (e.g. hotspot, rbac, explain, backup)..." oninput="filterSkills()">
+          <span id="skillCountBadge" class="count-badge">Loading skills...</span>
+        </div>
+        <div id="skillsGrid" class="skills-grid">
+          <!-- Skills rendered via JS -->
+        </div>
+      </section>
+
+      <!-- TAB 4: ADAPTERS -->
+      <section id="tab-adapters" class="tab-panel">
+        <div class="adapters-grid">
+          <div class="card adapter-card">
+            <div class="adapter-icon">🤖</div>
+            <h3>MCP Server</h3>
+            <p>Model Context Protocol stdio server exposing 21 skills and DB execution tools.</p>
+            <code>make mcp</code>
+            <span class="status-ok">Active stdio v2024-11-05</span>
+          </div>
+
+          <div class="card adapter-card">
+            <div class="adapter-icon">⚡</div>
+            <h3>Cursor Rules</h3>
+            <p>Auto-generated <code>.cursor/rules/*.mdc</code> rule files for Cursor IDE pair programming.</p>
+            <code>make cursor</code>
+            <span class="status-ok">21 MDC Rules Generated</span>
+          </div>
+
+          <div class="card adapter-card">
+            <div class="adapter-icon">🦜</div>
+            <h3>LangChain Package</h3>
+            <p>Python <code>StructuredTool</code> wrappers for LangChain agent toolchains.</p>
+            <code>from adapters.langchain.src import load_skills</code>
+            <span class="status-ok">Package Ready</span>
+          </div>
+
+          <div class="card adapter-card">
+            <div class="adapter-icon">☁️</div>
+            <h3>AWS Bedrock & Lambda</h3>
+            <p>OpenAPI 3.0 Action Group specification & serverless AWS Lambda handler.</p>
+            <code>python adapters/aws-bedrock/generate_openapi.py</code>
+            <span class="status-ok">Action Group OpenAPI Spec Generated</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 5: TELEMETRY -->
+      <section id="tab-telemetry" class="tab-panel">
+        <div class="card glass-panel">
+          <h2>Amazon S3 Diagnostic Telemetry Archive</h2>
+          <p class="subtitle">Structured JSON telemetry audit trails archived automatically after every agent execution.</p>
+          <pre class="telemetry-json">
+{
+  "scenario": "performance-diagnosis",
+  "user_question": "My query is slow. Find out why and fix it.",
+  "selected_skill": "explain-analyze-reading",
+  "before_scan": "full_scan",
+  "after_scan": "index_scan_covering",
+  "latency_improvement": "94%",
+  "s3_uri": "s3://crdb-skillforge-telemetry/telemetry/diagnostic_20260818.json",
+  "status": "RESOLVED"
+}
+          </pre>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <p>CrDB SkillForge — Open Source Apache-2.0 Platform | <a href="https://github.com/harshit075/crdb-skillforge.git" target="_blank">GitHub Repository</a></p>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
